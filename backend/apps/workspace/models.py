@@ -13,3 +13,24 @@ class Workspace(models.Model):
     def __str__(self):
         return self.name
     
+class WorkspaceMember(models.Model):
+    ROLE_CHOICES = [
+        ('ADMIN', 'Admin'),
+        ('OWNER', 'Owner'),
+        ('MEMBER', 'Member'),
+        ('GUEST', 'Guest'),    
+    ]
+    
+    workspace = models.ForeignKey(Workspace, on_delete=models.CASCADE, related_name='members')
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='MEMBER')
+    joined_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['workspace', 'user'], name='unique_workspace_member')
+        ]
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.workspace.name}"
