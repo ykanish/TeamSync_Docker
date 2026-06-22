@@ -90,3 +90,37 @@ class Channel(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Message(models.Model):
+
+    channel = models.ForeignKey(
+        Channel,
+        on_delete=models.CASCADE,
+        related_name="messages"
+    )
+
+    sender = models.ForeignKey(
+        "auth.User",
+        on_delete=models.CASCADE,
+        related_name="messages"
+    )
+
+    content = models.TextField()
+
+    is_edited = models.BooleanField(
+        default=False
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return f"{self.sender.username}: {self.content[:30]}"
